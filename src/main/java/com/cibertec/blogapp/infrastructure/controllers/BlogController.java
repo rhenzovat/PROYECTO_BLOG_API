@@ -36,7 +36,7 @@ public class BlogController {
     }
 
 
-//    me quede hasat aqui
+//    me quede hasta aqui
     @PutMapping("/{id}")
     public ResponseEntity<Blog> updateBlog(
             @PathVariable Long id,
@@ -51,5 +51,23 @@ public class BlogController {
         Blog updated = blogService.update(id, blog, username, isAdmin);
         return ResponseEntity.ok(updated);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+
+        boolean isAdmin = authentication.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        authentication.getAuthorities()
+                .forEach(a -> System.out.println(a.getAuthority()));
+        blogService.delete(id, isAdmin);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }
 

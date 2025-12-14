@@ -19,11 +19,21 @@ public class BlogPersistenceAdapter implements BlogPersistencePort {
     @Override
     public Blog save(Blog blog) {
 
-        BlogEntity entity = new BlogEntity();
+        BlogEntity entity;
+
+        if (blog.getId() != null) {
+            // UPDATE
+            entity = repository.findById(blog.getId())
+                    .orElseThrow(() -> new RuntimeException("BlogEntity no encontrada"));
+        } else {
+            // INSERT
+            entity = new BlogEntity();
+            entity.setCreatedAt(blog.getCreatedAt());
+        }
+
         entity.setTitle(blog.getTitle());
         entity.setContent(blog.getContent());
         entity.setAuthorUsername(blog.getAuthorUsername());
-        entity.setCreatedAt(blog.getCreatedAt());
 
         BlogEntity saved = repository.save(entity);
 

@@ -53,6 +53,43 @@ public class BlogServiceImpl implements BlogService {
                 .toList();
     }
 
+    @Override
+    public Blog update(Long id, Blog newBlog, String username, boolean isAdmin) {
+
+        Blog existingBlog = blogPort.findById(id)
+                .orElseThrow(() -> new RuntimeException("Blog no encontrado"));
+
+        if (existingBlog == null) {
+            throw new RuntimeException("Blog no encontrado");
+        }
+
+        if (!existingBlog.getAuthorUsername().equals(username) && !isAdmin) {
+            throw new RuntimeException("No tienes permiso para editar este blog");
+        }
+
+        existingBlog.update(
+                newBlog.getTitle(),
+                newBlog.getContent()
+        );
+
+        return blogPort.save(existingBlog);
+    }
+
+    @Override
+    public void delete(Long id, boolean isAdmin) {
+
+        if (!isAdmin) {
+            throw new RuntimeException("Solo ADMIN puede eliminar blogs");
+        }
+
+        Blog blog = blogPort.findById(id)
+                .orElseThrow(() -> new RuntimeException("Blog no encontrado"));
+
+        blogPort.deleteById(blog.getId());
+    }
+
+
+
 
 }
 

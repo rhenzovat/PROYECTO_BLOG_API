@@ -2,42 +2,32 @@ package com.cibertec.blogapp.domain.model;
 
 import java.time.LocalDateTime;
 
-public class Blog {
+public class Comment {
 
     private Long id;
-    private String title;
+    private Long blogId;
     private String content;
     private String authorUsername;
     private LocalDateTime createdAt;
 
-    public Blog(
+    public Comment(
             Long id,
-            String title,
+            Long blogId,
             String content,
             String authorUsername,
             LocalDateTime createdAt
     ) {
         this.id = id;
-        this.title = title;
+        this.blogId = blogId;
         this.content = content;
         this.authorUsername = authorUsername;
         this.createdAt = createdAt;
     }
 
-    public void update(String title, String content) {
-        this.title = title;
-        this.content = content;
-    }
-
-    // getters
     public Long getId() { return id; }
-    public String getTitle() { return title; }
+    public Long getBlogId() { return blogId; }
     public String getContent() { return content; }
     public String getAuthorUsername() { return authorUsername; }
     public LocalDateTime getCreatedAt() { return createdAt; }
-
-
-
-
 }
 

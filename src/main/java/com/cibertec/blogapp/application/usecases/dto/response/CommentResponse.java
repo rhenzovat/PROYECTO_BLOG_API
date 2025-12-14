@@ -1,18 +1,19 @@
 package com.cibertec.blogapp.application.usecases.dto.response;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class BlogResponse {
+@NoArgsConstructor
+public class CommentResponse {
+
     private Long id;
-    private String title;
     private String content;
-    private String author;
+    private String authorUsername;
     private LocalDateTime createdAt;
-
 }
-
