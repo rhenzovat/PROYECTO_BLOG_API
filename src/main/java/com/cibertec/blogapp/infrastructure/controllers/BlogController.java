@@ -2,8 +2,10 @@ package com.cibertec.blogapp.infrastructure.controllers;
 
 import com.cibertec.blogapp.application.usecases.BlogService;
 import com.cibertec.blogapp.application.usecases.dto.request.CreateBlogRequest;
+import com.cibertec.blogapp.application.usecases.dto.response.BlogHomeResponse;
 import com.cibertec.blogapp.application.usecases.dto.response.BlogResponse;
 import com.cibertec.blogapp.domain.model.Blog;
+import com.cibertec.blogapp.domain.model.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,27 +15,41 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/blogs")
+@RequestMapping("/api/blogs")
 @RequiredArgsConstructor
 public class BlogController {
 
     private final BlogService blogService;
 
     @PostMapping
-    public BlogResponse create(@RequestBody CreateBlogRequest request) {
+    public BlogResponse create(
+            @RequestBody CreateBlogRequest request,
+            Authentication authentication
+    ) {
+        if (authentication == null ||
+                authentication.getPrincipal().equals("anonymousUser")) {
+            throw new RuntimeException("Usuario no autenticado");
+        }
 
-        String username = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
-
+        String username = authentication.getName();
         return blogService.create(request, username);
     }
+//    @PostMapping
+//    public BlogResponse create(@RequestBody CreateBlogRequest request) {
+//
+//        String username = SecurityContextHolder
+//                .getContext()
+//                .getAuthentication()
+//                .getName();
+//
+//        return blogService.create(request, username);
+//    }
 
-    @GetMapping
-    public List<BlogResponse> findAll() {
-        return blogService.findAll();
-    }
+//    @GetMapping
+//    public List<BlogResponse> findAll() {
+//        System.out.println("ENTRÓ AL CONTROLLER");
+//        return blogService.findAll();
+//    }
 
 
 //    me quede hasta aqui
@@ -67,6 +83,21 @@ public class BlogController {
         blogService.delete(id, isAdmin);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public List<BlogResponse> findAll(
+            @RequestParam(required = false) Category category
+    ) {
+        return blogService.findAll(category);
+    }
+
+    @GetMapping("/home")
+    public List<BlogHomeResponse> home(
+            @RequestParam(defaultValue = "recentes") String tipo,
+            @RequestParam(required = false) Category category
+    ) {
+        return blogService.getHomeBlogs(tipo, category);
     }
 
 }

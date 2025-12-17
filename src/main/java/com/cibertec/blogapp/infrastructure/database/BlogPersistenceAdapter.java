@@ -1,6 +1,8 @@
 package com.cibertec.blogapp.infrastructure.database;
 
+import com.cibertec.blogapp.application.usecases.dto.response.BlogHomeResponse;
 import com.cibertec.blogapp.domain.model.Blog;
+import com.cibertec.blogapp.domain.model.Category;
 import com.cibertec.blogapp.domain.services.BlogPersistencePort;
 import com.cibertec.blogapp.infrastructure.database.entities.BlogEntity;
 import com.cibertec.blogapp.infrastructure.database.respositories.BlogRepository;
@@ -34,6 +36,7 @@ public class BlogPersistenceAdapter implements BlogPersistencePort {
         entity.setTitle(blog.getTitle());
         entity.setContent(blog.getContent());
         entity.setAuthorUsername(blog.getAuthorUsername());
+        entity.setCategory(blog.getCategory());
 
         BlogEntity saved = repository.save(entity);
 
@@ -42,7 +45,8 @@ public class BlogPersistenceAdapter implements BlogPersistencePort {
                 saved.getTitle(),
                 saved.getContent(),
                 saved.getAuthorUsername(),
-                saved.getCreatedAt()
+                entity.getCreatedAt(),
+                entity.getCategory()
         );
     }
 
@@ -54,20 +58,22 @@ public class BlogPersistenceAdapter implements BlogPersistencePort {
                         e.getTitle(),
                         e.getContent(),
                         e.getAuthorUsername(),
-                        e.getCreatedAt()
+                        e.getCreatedAt(),
+                        e.getCategory()
                 ));
     }
 
     @Override
     public List<Blog> findAll() {
-        return repository.findAll()
+        return repository.findAllByOrderByCreatedAtDesc()
                 .stream()
                 .map(e -> new Blog(
                         e.getId(),
                         e.getTitle(),
                         e.getContent(),
                         e.getAuthorUsername(),
-                        e.getCreatedAt()
+                        e.getCreatedAt(),
+                        e.getCategory()
                 ))
                 .toList();
     }
@@ -76,4 +82,36 @@ public class BlogPersistenceAdapter implements BlogPersistencePort {
     public void deleteById(Long id) {
         repository.deleteById(id);
     }
+
+    @Override
+    public List<Blog> findByCategory(Category category) {
+        return repository.findByCategoryOrderByCreatedAtDesc(category)
+                .stream()
+                .map(e -> new Blog(
+                        e.getId(),
+                        e.getTitle(),
+                        e.getContent(),
+                        e.getAuthorUsername(),
+                        e.getCreatedAt(),
+                        e.getCategory()
+
+                ))
+                .toList();
+    }
+
+    @Override
+    public List<BlogHomeResponse> findRecentBlogs() {
+        return repository.findRecentBlogs();
+    }
+
+    @Override
+    public List<BlogHomeResponse> findMostCommentedBlogs() {
+        return repository.findMostCommentedBlogs();
+    }
+
+    @Override
+    public List<BlogHomeResponse> findHomeByCategory(Category category) {
+        return repository.findHomeByCategory(category);
+    }
+
 }

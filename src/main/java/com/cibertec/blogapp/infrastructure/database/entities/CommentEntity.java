@@ -16,7 +16,9 @@ public class CommentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long blogId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blog_id", nullable = false)
+    private BlogEntity blog;
 
     @Column(columnDefinition = "TEXT")
     private String content;

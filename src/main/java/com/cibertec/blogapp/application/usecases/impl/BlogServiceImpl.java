@@ -2,8 +2,10 @@ package com.cibertec.blogapp.application.usecases.impl;
 
 import com.cibertec.blogapp.application.usecases.BlogService;
 import com.cibertec.blogapp.application.usecases.dto.request.CreateBlogRequest;
+import com.cibertec.blogapp.application.usecases.dto.response.BlogHomeResponse;
 import com.cibertec.blogapp.application.usecases.dto.response.BlogResponse;
 import com.cibertec.blogapp.domain.model.Blog;
+import com.cibertec.blogapp.domain.model.Category;
 import com.cibertec.blogapp.domain.services.BlogPersistencePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,12 +22,18 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public BlogResponse create(CreateBlogRequest request, String username) {
 
+        if (request.getCategory() == null) {
+            throw new RuntimeException("La categoría es obligatoria");
+        }
+
         Blog blog = new Blog(
                 null,
                 request.getTitle(),
                 request.getContent(),
                 username,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                request.getCategory()
+
         );
 
         Blog saved = blogPort.save(blog);
@@ -35,7 +43,9 @@ public class BlogServiceImpl implements BlogService {
                 saved.getTitle(),
                 saved.getContent(),
                 saved.getAuthorUsername(),
-                saved.getCreatedAt()
+                saved.getCreatedAt(),
+                saved.getCategory()
+
         );
     }
 
@@ -48,7 +58,10 @@ public class BlogServiceImpl implements BlogService {
                         b.getTitle(),
                         b.getContent(),
                         b.getAuthorUsername(),
-                        b.getCreatedAt()
+                        b.getCreatedAt(),
+                        b.getCategory()
+
+
                 ))
                 .toList();
     }
@@ -88,6 +101,37 @@ public class BlogServiceImpl implements BlogService {
         blogPort.deleteById(blog.getId());
     }
 
+    @Override
+    public List<BlogResponse> findAll(Category category) {
+
+        List<Blog> blogs = (category != null)
+                ? blogPort.findByCategory(category)
+                : blogPort.findAll();
+
+        return blogs.stream()
+                .map(b -> new BlogResponse(
+                        b.getId(),
+                        b.getTitle(),
+                        b.getContent(),
+                        b.getAuthorUsername(),
+                        b.getCreatedAt(),
+                        b.getCategory()
+
+                ))
+                .toList();
+    }
+
+    @Override
+    public List<BlogHomeResponse> getHomeBlogs(
+            String type,
+            Category category
+    ) {
+        return switch (type) {
+            case "comentados" -> blogPort.findMostCommentedBlogs();
+            case "categoria" -> blogPort.findHomeByCategory(category);
+            default -> blogPort.findRecentBlogs();
+        };
+    }
 
 
 

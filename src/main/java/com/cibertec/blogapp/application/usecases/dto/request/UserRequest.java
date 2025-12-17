@@ -1,16 +1,16 @@
-package com.cibertec.blogapp.application.usecases.dto.response;
+package com.cibertec.blogapp.application.usecases.dto.request;
 
 import com.cibertec.blogapp.domain.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserResponse {
+public class UserRequest {
     private Long id;
     private String username;
     private Role role;
-
 }
