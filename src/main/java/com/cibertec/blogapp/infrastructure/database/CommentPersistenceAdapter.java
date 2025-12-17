@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -57,7 +58,7 @@ public class CommentPersistenceAdapter implements CommentPersistencePort {
     }
 
     @Override
-    public Comment findById(Long id) {
+    public Optional<Comment> findById(Long id) {
         return commentRepository.findById(id)
                 .map(e -> new Comment(
                         e.getId(),
@@ -65,8 +66,8 @@ public class CommentPersistenceAdapter implements CommentPersistencePort {
                         e.getContent(),         // ✅ 3ro
                         e.getAuthorUsername(),  // ✅ 4to
                         e.getCreatedAt()
-                ))
-                .orElse(null);
+                ));
+
     }
 
     @Override

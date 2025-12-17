@@ -73,6 +73,7 @@ public class BlogController {
             @PathVariable Long id,
             Authentication authentication
     ) {
+        String username = authentication.getName();
 
         boolean isAdmin = authentication.getAuthorities()
                 .stream()
@@ -80,7 +81,7 @@ public class BlogController {
 
         authentication.getAuthorities()
                 .forEach(a -> System.out.println(a.getAuthority()));
-        blogService.delete(id, isAdmin);
+        blogService.delete(id, isAdmin, username);
 
         return ResponseEntity.noContent().build();
     }

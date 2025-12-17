@@ -63,14 +63,12 @@ public class CommentServiceImpl implements CommentService {
             boolean isAdmin
     ) {
 
-        Comment comment = commentPort.findById(commentId);
+        Comment comment = commentPort.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
 
-        if (comment == null) {
-            throw new RuntimeException("Comentario no encontrado");
-        }
+        boolean isAuthor = comment.getAuthorUsername().equals(username);
 
-        // 🔐 Seguridad
-        if (!comment.getAuthorUsername().equals(username) && !isAdmin) {
+        if (!isAdmin && !isAuthor) {
             throw new RuntimeException("No tienes permiso para eliminar este comentario");
         }
 

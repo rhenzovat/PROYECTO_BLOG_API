@@ -51,7 +51,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/blogs/**").authenticated()
 
                         // Eliminación solo ADMIN
-                        .requestMatchers(HttpMethod.DELETE, "/api/blogs/**").hasRole("ADMIN")
+//                        .requestMatchers(HttpMethod.DELETE, "/api/blogs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/**").authenticated()
 
                         .anyRequest().authenticated()
                 )

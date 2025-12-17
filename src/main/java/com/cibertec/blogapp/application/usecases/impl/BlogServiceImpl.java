@@ -89,16 +89,18 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    public void delete(Long id, boolean isAdmin) {
-
-        if (!isAdmin) {
-            throw new RuntimeException("Solo ADMIN puede eliminar blogs");
-        }
+    public void delete(Long id, boolean isAdmin, String username) {
 
         Blog blog = blogPort.findById(id)
                 .orElseThrow(() -> new RuntimeException("Blog no encontrado"));
 
-        blogPort.deleteById(blog.getId());
+        boolean isAuthor = blog.getAuthorUsername().equals(username);
+
+        if (!isAdmin && !isAuthor) {
+            throw new RuntimeException("No tienes permiso para eliminar este blog");
+        }
+
+        blogPort.deleteById(id);
     }
 
     @Override

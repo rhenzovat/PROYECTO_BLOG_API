@@ -16,7 +16,7 @@ public interface BlogService {
 
     Blog update(Long id, Blog newBlog, String username, boolean isAdmin);
 
-    void delete(Long id, boolean isAdmin);
+    void delete(Long id, boolean isAdmin, String username);
 
     List<BlogResponse> findAll(Category category);
 

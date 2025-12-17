@@ -3,6 +3,7 @@ package com.cibertec.blogapp.domain.services;
 import com.cibertec.blogapp.domain.model.Comment;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CommentPersistencePort {
 
@@ -10,7 +11,7 @@ public interface CommentPersistencePort {
 
     List<Comment> findByBlogId(Long blogId);
 
-    Comment findById(Long id);
+    Optional<Comment> findById(Long id);
 
     void deleteById(Long id);
 
