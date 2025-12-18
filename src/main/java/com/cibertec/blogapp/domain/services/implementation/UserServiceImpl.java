@@ -44,4 +44,10 @@ public class UserServiceImpl implements IUserService {
     public List<User> getAllUsers() {
         return userPort.findAll();
     }
+
+    @Override
+    public User findByUsername(String username) {
+        return userPort.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    }
 }

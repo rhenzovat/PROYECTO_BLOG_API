@@ -13,6 +13,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -28,17 +34,11 @@ public class SecurityConfig {
             throws Exception {
 
         http
+                .cors(cors -> {}) // ✅ ACTIVA CORS usando tu CorsConfigurationSource
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/auth/**").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/blogs").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/blogs/**").permitAll()
-//                        .requestMatchers("/admin/**").hasRole("ADMIN")
-//                        .anyRequest().authenticated()
-//                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
 
@@ -47,13 +47,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/blogs/**").permitAll()
 
                         // Escritura
-
                         .requestMatchers(HttpMethod.POST, "/api/blogs").authenticated()
-
                         .requestMatchers(HttpMethod.PUT, "/api/blogs/**").authenticated()
 
-                        // Eliminación solo ADMIN
-//                        .requestMatchers(HttpMethod.DELETE, "/api/blogs/**").hasRole("ADMIN")
+                        // Eliminación
                         .requestMatchers(HttpMethod.DELETE, "/api/**").authenticated()
 
                         .anyRequest().authenticated()
@@ -80,6 +77,20 @@ public class SecurityConfig {
         );
 
         return provider;
+    }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
     }
 }
 
