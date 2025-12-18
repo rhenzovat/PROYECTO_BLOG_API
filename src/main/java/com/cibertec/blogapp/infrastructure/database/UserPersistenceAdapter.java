@@ -7,6 +7,7 @@ import com.cibertec.blogapp.infrastructure.database.respositories.UserRepository
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -36,6 +37,19 @@ public class UserPersistenceAdapter implements UserPersistencePort {
                         entity.getPassword(),
                         entity.getRole()
                 ));
+    }
+
+    @Override
+    public List<User> findAll() {
+        return repository.findAll()
+                .stream()
+                .map(entity -> new User(
+                        entity.getId(),
+                        entity.getUsername(),
+                        null,                // 🔐 nunca devolver password
+                        entity.getRole()
+                ))
+                .toList();
     }
 
 }

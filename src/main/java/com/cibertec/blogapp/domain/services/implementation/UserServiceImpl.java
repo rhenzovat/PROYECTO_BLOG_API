@@ -35,8 +35,13 @@ public class UserServiceImpl implements IUserService {
         throw new UnsupportedOperationException("Login not implemented yet");
     }
 
+//    @Override
+//    public List<User> getAllUsers() {
+//        throw new UnsupportedOperationException("Get all users not implemented yet");
+//    }
+
     @Override
     public List<User> getAllUsers() {
-        throw new UnsupportedOperationException("Get all users not implemented yet");
+        return userPort.findAll();
     }
 }

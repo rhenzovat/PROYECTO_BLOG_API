@@ -3,6 +3,7 @@ package com.cibertec.blogapp.infrastructure.database.respositories;
 import com.cibertec.blogapp.application.usecases.dto.response.BlogHomeResponse;
 import com.cibertec.blogapp.domain.model.Category;
 import com.cibertec.blogapp.infrastructure.database.entities.BlogEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,7 +32,7 @@ public interface BlogRepository extends JpaRepository<BlogEntity, Long> {
     GROUP BY b
     ORDER BY b.createdAt DESC
 """)
-List<BlogHomeResponse> findRecentBlogs();
+List<BlogHomeResponse> findRecentBlogs(Pageable pageable);
 
     // 💬 Blogs más comentados
     @Query("""
@@ -48,7 +49,7 @@ List<BlogHomeResponse> findRecentBlogs();
         GROUP BY b
         ORDER BY COUNT(c) DESC
     """)
-    List<BlogHomeResponse> findMostCommentedBlogs();
+    List<BlogHomeResponse> findMostCommentedBlogs(Pageable pageable);
 
     // 🏷️ Filtro por categoría
     @Query("""
@@ -66,5 +67,5 @@ List<BlogHomeResponse> findRecentBlogs();
         GROUP BY b
         ORDER BY b.createdAt DESC
     """)
-    List<BlogHomeResponse> findHomeByCategory(@Param("category") Category category);
+    List<BlogHomeResponse> findHomeByCategory(@Param("category") Category category, Pageable pageable);
 }

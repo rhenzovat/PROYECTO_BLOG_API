@@ -6,6 +6,8 @@ import com.cibertec.blogapp.application.usecases.dto.response.CommentResponse;
 import com.cibertec.blogapp.domain.model.Comment;
 import com.cibertec.blogapp.domain.services.BlogPersistencePort;
 import com.cibertec.blogapp.domain.services.CommentPersistencePort;
+import com.cibertec.blogapp.exception.ForbiddenException;
+import com.cibertec.blogapp.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +25,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponse create(Long blogId, CreateCommentRequest request, String username) {
 
         blogPort.findById(blogId)
-                .orElseThrow(() -> new RuntimeException("Blog no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Blog no encontrado"));
 
         Comment comment = new Comment(
                 null,
@@ -64,12 +66,12 @@ public class CommentServiceImpl implements CommentService {
     ) {
 
         Comment comment = commentPort.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Comentario no encontrado"));
 
         boolean isAuthor = comment.getAuthorUsername().equals(username);
 
         if (!isAdmin && !isAuthor) {
-            throw new RuntimeException("No tienes permiso para eliminar este comentario");
+            throw new ForbiddenException("No tienes permiso para eliminar este comentario");
         }
 
         commentPort.deleteById(commentId);

@@ -7,6 +7,7 @@ import com.cibertec.blogapp.domain.services.BlogPersistencePort;
 import com.cibertec.blogapp.infrastructure.database.entities.BlogEntity;
 import com.cibertec.blogapp.infrastructure.database.respositories.BlogRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -100,18 +101,18 @@ public class BlogPersistenceAdapter implements BlogPersistencePort {
     }
 
     @Override
-    public List<BlogHomeResponse> findRecentBlogs() {
-        return repository.findRecentBlogs();
+    public List<BlogHomeResponse> findRecentBlogs(Pageable pageable) {
+        return repository.findRecentBlogs(pageable);
     }
 
     @Override
-    public List<BlogHomeResponse> findMostCommentedBlogs() {
-        return repository.findMostCommentedBlogs();
+    public List<BlogHomeResponse> findMostCommentedBlogs(Pageable pageable) {
+        return repository.findMostCommentedBlogs(pageable);
     }
 
     @Override
-    public List<BlogHomeResponse> findHomeByCategory(Category category) {
-        return repository.findHomeByCategory(category);
+    public List<BlogHomeResponse> findHomeByCategory(Category category, Pageable pageable) {
+        return repository.findHomeByCategory(category, pageable);
     }
 
 }

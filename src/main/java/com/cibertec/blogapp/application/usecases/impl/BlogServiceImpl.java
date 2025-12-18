@@ -7,7 +7,12 @@ import com.cibertec.blogapp.application.usecases.dto.response.BlogResponse;
 import com.cibertec.blogapp.domain.model.Blog;
 import com.cibertec.blogapp.domain.model.Category;
 import com.cibertec.blogapp.domain.services.BlogPersistencePort;
+import com.cibertec.blogapp.exception.BadRequestException;
+import com.cibertec.blogapp.exception.ForbiddenException;
+import com.cibertec.blogapp.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,7 +28,7 @@ public class BlogServiceImpl implements BlogService {
     public BlogResponse create(CreateBlogRequest request, String username) {
 
         if (request.getCategory() == null) {
-            throw new RuntimeException("La categoría es obligatoria");
+            throw new BadRequestException("La categoría es obligatoria");
         }
 
         Blog blog = new Blog(
@@ -70,14 +75,10 @@ public class BlogServiceImpl implements BlogService {
     public Blog update(Long id, Blog newBlog, String username, boolean isAdmin) {
 
         Blog existingBlog = blogPort.findById(id)
-                .orElseThrow(() -> new RuntimeException("Blog no encontrado"));
-
-        if (existingBlog == null) {
-            throw new RuntimeException("Blog no encontrado");
-        }
+                .orElseThrow(() -> new ResourceNotFoundException("Blog no encontrado"));
 
         if (!existingBlog.getAuthorUsername().equals(username) && !isAdmin) {
-            throw new RuntimeException("No tienes permiso para editar este blog");
+            throw new ForbiddenException("No tienes permiso para editar este blog");
         }
 
         existingBlog.update(
@@ -92,12 +93,12 @@ public class BlogServiceImpl implements BlogService {
     public void delete(Long id, boolean isAdmin, String username) {
 
         Blog blog = blogPort.findById(id)
-                .orElseThrow(() -> new RuntimeException("Blog no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Blog no encontrado"));
 
         boolean isAuthor = blog.getAuthorUsername().equals(username);
 
         if (!isAdmin && !isAuthor) {
-            throw new RuntimeException("No tienes permiso para eliminar este blog");
+            throw new ForbiddenException("No tienes permiso para borrar este blog");
         }
 
         blogPort.deleteById(id);
@@ -128,10 +129,12 @@ public class BlogServiceImpl implements BlogService {
             String type,
             Category category
     ) {
+        Pageable pageable = PageRequest.of(0, 5);
+
         return switch (type) {
-            case "comentados" -> blogPort.findMostCommentedBlogs();
-            case "categoria" -> blogPort.findHomeByCategory(category);
-            default -> blogPort.findRecentBlogs();
+            case "comentados" -> blogPort.findMostCommentedBlogs(pageable);
+            case "categoria" -> blogPort.findHomeByCategory(category, pageable);
+            default -> blogPort.findRecentBlogs(pageable);
         };
     }
 
