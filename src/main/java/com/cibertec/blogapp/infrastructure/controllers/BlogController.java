@@ -53,6 +53,13 @@ public class BlogController {
 
 
 //    me quede hasta aqui
+    @GetMapping("/{id}")
+    public ResponseEntity<BlogResponse> getById(@PathVariable Long id) {
+        // Asegúrate de que tu blogService tenga un método findById que devuelva un BlogResponse
+        BlogResponse response = blogService.findById(id);
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Blog> updateBlog(
             @PathVariable Long id,

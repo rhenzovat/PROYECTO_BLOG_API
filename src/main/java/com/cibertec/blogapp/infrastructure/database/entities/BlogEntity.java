@@ -30,7 +30,7 @@ public class BlogEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @OneToMany(mappedBy = "blog", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "blog", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentEntity> comments;
 
 

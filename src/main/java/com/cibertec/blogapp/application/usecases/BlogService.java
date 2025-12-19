@@ -21,6 +21,8 @@ public interface BlogService {
     List<BlogResponse> findAll(Category category);
 
     List<BlogHomeResponse> getHomeBlogs(String type, Category category);
+
+    BlogResponse findById(Long id);
 }
 
 

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -19,7 +20,7 @@ public class Blog {
     private Category category;
 
 
-
+    private List<Comment> comments;
 
     public void update(String title, String content) {
         this.title = title;

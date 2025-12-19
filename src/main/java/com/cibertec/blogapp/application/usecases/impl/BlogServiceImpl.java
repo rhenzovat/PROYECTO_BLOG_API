@@ -4,18 +4,21 @@ import com.cibertec.blogapp.application.usecases.BlogService;
 import com.cibertec.blogapp.application.usecases.dto.request.CreateBlogRequest;
 import com.cibertec.blogapp.application.usecases.dto.response.BlogHomeResponse;
 import com.cibertec.blogapp.application.usecases.dto.response.BlogResponse;
+import com.cibertec.blogapp.application.usecases.dto.response.CommentResponse;
 import com.cibertec.blogapp.domain.model.Blog;
 import com.cibertec.blogapp.domain.model.Category;
 import com.cibertec.blogapp.domain.services.BlogPersistencePort;
 import com.cibertec.blogapp.exception.BadRequestException;
 import com.cibertec.blogapp.exception.ForbiddenException;
 import com.cibertec.blogapp.exception.ResourceNotFoundException;
+import com.cibertec.blogapp.infrastructure.database.entities.BlogEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,8 +40,8 @@ public class BlogServiceImpl implements BlogService {
                 request.getContent(),
                 username,
                 LocalDateTime.now(),
-                request.getCategory()
-
+                request.getCategory(),
+                new java.util.ArrayList<>() // El 7mo parámetro
         );
 
         Blog saved = blogPort.save(blog);
@@ -49,7 +52,8 @@ public class BlogServiceImpl implements BlogService {
                 saved.getContent(),
                 saved.getAuthorUsername(),
                 saved.getCreatedAt(),
-                saved.getCategory()
+                saved.getCategory(),
+                new ArrayList<>()
 
         );
     }
@@ -64,7 +68,8 @@ public class BlogServiceImpl implements BlogService {
                         b.getContent(),
                         b.getAuthorUsername(),
                         b.getCreatedAt(),
-                        b.getCategory()
+                        b.getCategory(),
+                        new ArrayList<>()
 
 
                 ))
@@ -118,7 +123,8 @@ public class BlogServiceImpl implements BlogService {
                         b.getContent(),
                         b.getAuthorUsername(),
                         b.getCreatedAt(),
-                        b.getCategory()
+                        b.getCategory(),
+                        new ArrayList<>()
 
                 ))
                 .toList();
@@ -129,7 +135,7 @@ public class BlogServiceImpl implements BlogService {
             String type,
             Category category
     ) {
-        Pageable pageable = PageRequest.of(0, 5);
+        Pageable pageable = PageRequest.of(0, 6);
 
         return switch (type) {
             case "comentados" -> blogPort.findMostCommentedBlogs(pageable);
@@ -138,7 +144,31 @@ public class BlogServiceImpl implements BlogService {
         };
     }
 
-
+    @Override
+    public BlogResponse findById(Long id) {
+        // 1. Usamos blogPort (que ya lo tienes inyectado arriba) en lugar de blogRepository
+        // 2. Buscamos el objeto de dominio Blog
+        Blog blog = blogPort.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Blog no encontrado con ID: " + id));
+        List<CommentResponse> commentResponses = blog.getComments().stream()
+                .map(c -> new CommentResponse(
+                        c.getId(),
+                        c.getContent(),
+                        c.getAuthorUsername(),
+                        c.getCreatedAt()
+                ))
+                .toList();
+        // 3. Mapeamos el objeto de dominio Blog al DTO BlogResponse
+        return new BlogResponse(
+                blog.getId(),
+                blog.getTitle(),
+                blog.getContent(),
+                blog.getAuthorUsername(),
+                blog.getCreatedAt(),
+                blog.getCategory(),
+                commentResponses
+        );
+    }
 
 }
 
