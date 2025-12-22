@@ -1,6 +1,7 @@
 package com.cibertec.blogapp.application.usecases;
 
 import com.cibertec.blogapp.application.usecases.dto.request.CreateCommentRequest;
+import com.cibertec.blogapp.application.usecases.dto.request.UpdateCommentRequest;
 import com.cibertec.blogapp.application.usecases.dto.response.CommentResponse;
 import java.util.List;
 
@@ -11,4 +12,10 @@ public interface CommentService {
     List<CommentResponse> findByBlog(Long blogId);
 
     void delete(Long commentId, String username, boolean isAdmin);
+
+    CommentResponse updateComment(
+            Long commentId,
+            UpdateCommentRequest request,
+            String username
+    );
 }

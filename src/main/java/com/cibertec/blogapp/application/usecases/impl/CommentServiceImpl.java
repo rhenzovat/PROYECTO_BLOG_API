@@ -2,10 +2,13 @@ package com.cibertec.blogapp.application.usecases.impl;
 
 import com.cibertec.blogapp.application.usecases.CommentService;
 import com.cibertec.blogapp.application.usecases.dto.request.CreateCommentRequest;
+import com.cibertec.blogapp.application.usecases.dto.request.UpdateCommentRequest;
 import com.cibertec.blogapp.application.usecases.dto.response.CommentResponse;
 import com.cibertec.blogapp.domain.model.Comment;
+import com.cibertec.blogapp.domain.model.User;
 import com.cibertec.blogapp.domain.services.BlogPersistencePort;
 import com.cibertec.blogapp.domain.services.CommentPersistencePort;
+import com.cibertec.blogapp.domain.services.UserPersistencePort;
 import com.cibertec.blogapp.exception.ForbiddenException;
 import com.cibertec.blogapp.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentPersistencePort commentPort;
     private final BlogPersistencePort blogPort;
+    private final UserPersistencePort userPort;
 
     @Override
     public CommentResponse create(Long blogId, CreateCommentRequest request, String username) {
@@ -75,5 +79,45 @@ public class CommentServiceImpl implements CommentService {
         }
 
         commentPort.deleteById(commentId);
+    }
+
+    @Override
+    public CommentResponse updateComment(
+            Long commentId,
+            UpdateCommentRequest request,
+            String username
+    ) {
+
+        Comment comment = commentPort.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comentario no encontrado"));
+
+        User user = userPort.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        // 🔐 VALIDACIÓN DE PERMISOS
+        boolean isAuthor = comment.getAuthorUsername().equals(username);
+        boolean isAdmin = user.getRole().name().equals("ADMIN");
+
+        if (!isAuthor && !isAdmin) {
+            throw new ForbiddenException("No tienes permiso para editar este comentario");
+        }
+
+        // ✏️ ACTUALIZAR CONTENIDO
+        Comment updated = new Comment(
+                comment.getId(),
+                comment.getBlogId(),
+                request.getContent(),
+                comment.getAuthorUsername(),
+                comment.getCreatedAt()
+        );
+
+        Comment saved = commentPort.save(updated);
+
+        return new CommentResponse(
+                saved.getId(),
+                saved.getContent(),
+                saved.getAuthorUsername(),
+                saved.getCreatedAt()
+        );
     }
 }

@@ -42,6 +42,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
 
+                        .requestMatchers(HttpMethod.PUT, "/api/comments/**").authenticated()
+
                         // Lectura pública
                         .requestMatchers(HttpMethod.GET, "/api/blogs").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/blogs/**").permitAll()

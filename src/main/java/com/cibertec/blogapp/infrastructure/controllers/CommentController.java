@@ -2,8 +2,10 @@ package com.cibertec.blogapp.infrastructure.controllers;
 
 import com.cibertec.blogapp.application.usecases.CommentService;
 import com.cibertec.blogapp.application.usecases.dto.request.CreateCommentRequest;
+import com.cibertec.blogapp.application.usecases.dto.request.UpdateCommentRequest;
 import com.cibertec.blogapp.application.usecases.dto.response.CommentResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +46,21 @@ public class CommentController {
                 commentId,
                 user.getUsername(),
                 isAdmin
+        );
+    }
+
+    @PutMapping("/{commentId}")
+    public CommentResponse updateComment(
+            @PathVariable Long commentId,
+            @RequestBody UpdateCommentRequest request,
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+
+        return commentService.updateComment(
+                commentId,
+                request,
+                username
         );
     }
 }

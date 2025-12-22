@@ -25,12 +25,22 @@ public class CommentPersistenceAdapter implements CommentPersistencePort {
         BlogEntity blogEntity = blogRepository.findById(comment.getBlogId())
                 .orElseThrow(() -> new RuntimeException("Blog no encontrado"));
 
-        CommentEntity entity = new CommentEntity();
-//        entity.setBlogId(comment.getBlogId());
+        CommentEntity entity;
+
+        // 🔹 SI EXISTE → UPDATE
+        if (comment.getId() != null) {
+            entity = commentRepository.findById(comment.getId())
+                    .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
+        } else {
+            // 🔹 SI NO EXISTE → CREATE
+            entity = new CommentEntity();
+            entity.setBlog(blogEntity);
+            entity.setAuthorUsername(comment.getAuthorUsername());
+            entity.setCreatedAt(comment.getCreatedAt());
+        }
+
+        // 🔹 SOLO SE ACTUALIZA EL CONTENIDO
         entity.setContent(comment.getContent());
-        entity.setAuthorUsername(comment.getAuthorUsername());
-        entity.setCreatedAt(comment.getCreatedAt());
-        entity.setBlog(blogEntity);
 
         CommentEntity saved = commentRepository.save(entity);
 
