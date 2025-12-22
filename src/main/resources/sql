@@ -1,0 +1,26 @@
+CREATE DATABASE blogapp_db;
+use blogapp_db;
+
+CREATE TABLE blogs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    author_username VARCHAR(100) NOT NULL,
+    created_at DATETIME NOT NULL
+);
+SELECT * FROM blogs;
+SELECT DISTINCT category FROM blogs;
+DELETE FROM blogs;
+delete FROM comments;
+SELECT * FROM users;
+SELECT * FROM comments;
+UPDATE users
+SET role = 'ADMIN'
+WHERE username = 'renzo';
+
+ALTER TABLE blogs
+ADD category VARCHAR(50) NOT NULL;
+SELECT id, category FROM blogs;
+UPDATE blogs SET category = 'JAVA' WHERE id = 1;
+UPDATE blogs SET category = 'SPRING' WHERE id = 4;
+UPDATE blogs SET category = 'FRONTEND' WHERE id = 3;
